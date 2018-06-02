@@ -7,6 +7,7 @@ class Menu
 {
 public:
 	Menu(float width, float height);
+	Menu() = delete;
 	~Menu() = default;
 
 	void Draw(sf::RenderWindow &window);

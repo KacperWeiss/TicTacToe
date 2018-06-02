@@ -12,6 +12,7 @@ class Options
 {
 public:
 	Options(float width, float height);
+	Options() = delete;
 	~Options() = default;
 
 	void Draw(sf::RenderWindow &window);
