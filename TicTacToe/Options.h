@@ -3,6 +3,11 @@
 
 #define MAX_NUMBER_OF_MENU_ITEMS 3
 
+enum OptionsState
+{
+	Navigation, ChangingValues
+};
+
 class Options
 {
 public:
@@ -10,11 +15,17 @@ public:
 	~Options() = default;
 
 	void Draw(sf::RenderWindow &window);
+	void ChangeState();
 	void MoveUp();
 	void MoveDown();
-	int GetPressedItem() { return selectedItemIndex; }
+
+	int GetSelectedItem() { return selectedItemIndex; }
+	int GetBoardSize() { return boardSizeValue; }
+	int GetWinningRow() { return winningRowsValue; }
+	OptionsState GetCurrentOptionsState() { return currentState; }
 
 private:
+	OptionsState currentState;
 	int selectedItemIndex;
 	int boardSizeValue;
 	int winningRowsValue;
