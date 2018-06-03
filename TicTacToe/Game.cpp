@@ -46,6 +46,7 @@ void Game::Reconfigure(float width, float height, int size, int winingRow)
 
 	// Deleting crosses
 	crossShapes.clear();
+	cirkleShapes.clear();
 
 	// Deleting old board array
 	for (int i = 0; i < _size; i++) {
@@ -106,6 +107,23 @@ void Game::Draw(sf::RenderWindow &window)
 	{
 		window.draw(crossShapes[i]);
 	}
+
+	for (int i = 0; i < cirkleShapes.size(); i++)
+	{
+		window.draw(cirkleShapes[i]);
+	}
+}
+
+void Game::switchPlayer()
+{
+	if (currentPlayer == Player::X)
+	{
+		currentPlayer = Player::O;
+	}
+	else
+	{
+		currentPlayer = Player::X;
+	}
 }
 
 void Game::DetectMouseClick(int x, int y)
@@ -133,9 +151,15 @@ void Game::DetectMouseClick(int x, int y)
 					text.setString("Player X won! \n Press \'R\' to restart, \n or escape to go back!");
 					return;
 				}
+				else if(CheckWin(boardCoordinatesX, boardCoordinatesY) == -1)
+				{
+					text.setFillColor(sf::Color::Yellow);
+					text.setString("Draw! \n Press \'R\' to restart, \n or escape to go back!");
+					return;
+				}
 				
-				//text.setString("Current player: O ");
-				//currentPlayer = Player::O;
+				text.setString("Current player: O ");
+				switchPlayer();
 			}
 		}
 		break;
@@ -147,6 +171,9 @@ void Game::DetectMouseClick(int x, int y)
 
 int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 {
+	lastMove.x = x;
+	lastMove.y = y;
+
 	int horizontalPoints = 0;
 	int verticalPoints = 0;
 
@@ -328,4 +355,48 @@ int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 	}
 
 	return 0;
+}
+
+void Game::PlaceO(int x, int y)
+{
+	switch (currentPlayer)
+	{
+	case O: // AI player
+		if (_board[x][y] == 0)
+		{
+			if (whoWon != 0)
+			{
+				return;
+			}
+			_board[x][y] = 2;
+
+			sf::CircleShape circle(20 + x * oneSquareHeight, 20 + y * oneSquareHeight);
+			circle.setRadius(oneSquareHeight / 2 - 4);
+			circle.setFillColor(sf::Color::Transparent);
+			circle.setOutlineColor(sf::Color::Blue);
+			circle.setOutlineThickness(2.0);
+
+			cirkleShapes.push_back(circle);
+			if (CheckWin(boardCoordinatesX, boardCoordinatesY) == 2)
+			{
+				text.setFillColor(sf::Color::Red);
+				text.setString("Player O won! \n Press \'R\' to restart, \n or escape to go back!");
+				return;
+			}
+			else if (CheckWin(boardCoordinatesX, boardCoordinatesY) == -1)
+			{
+				text.setFillColor(sf::Color::Yellow);
+				text.setString("Draw! \n Press \'R\' to restart, \n or escape to go back!");
+				return;
+			}
+
+			text.setString("Current player: X ");
+			switchPlayer();
+		}
+		break;
+
+	case X: // Human player -> it should never happen
+		switchPlayer();
+		break;
+	}
 }

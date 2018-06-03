@@ -36,6 +36,15 @@ public:
 		return currentPlayer;
 	}
 
+	void switchPlayer();
+
+	sf::Vector2i GetLastMove()
+	{
+		return lastMove;
+	}
+
+	void PlaceO(int x, int y);
+
 private:
 	sf::RectangleShape boardOutline;
 	sf::RectangleShape *boardInsideLines;
@@ -53,5 +62,6 @@ private:
 	int boardCoordinatesY;
 	int whoWon;
 
+	sf::Vector2i lastMove;
 };
 

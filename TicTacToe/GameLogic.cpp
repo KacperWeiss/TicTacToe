@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "GameLogic.h"
+#include <iostream>
 
+GameLogic::GameLogic()
+{
+	whoWon = 0;
+}
 
 GameLogic::~GameLogic()
 {
@@ -33,6 +38,14 @@ void GameLogic::init(int size, int winningRow, int **board, Player player)
 		{
 			_arr[i][j] = board[i][j];
 		}
+	}
+	for (int j = 0; j < _size; j++) 
+	{
+		for (int i = 0; i < _size; i++) 
+		{
+			std::cout << "|" << _arr[i][j];
+		}
+		std::cout << "|" << std::endl;
 	}
 }
 
@@ -83,11 +96,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 	case X:
 		for (int i = 0; i < _size; i++)
 		{
-			if (_board[i][y] == 0 || _board[i][y] == 2)
+			if (_arr[i][y] == 0 || _arr[i][y] == 2)
 			{
 				horizontalPoints = 0;
 			}
-			if (_board[i][y] == 1)
+			if (_arr[i][y] == 1)
 			{
 				horizontalPoints++;
 			}
@@ -99,11 +112,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 		}
 		for (int i = 0; i < _size; i++)
 		{
-			if (_board[x][i] == 0 || _board[x][i] == 2)
+			if (_arr[x][i] == 0 || _arr[x][i] == 2)
 			{
 				verticalPoints = 0;
 			}
-			if (_board[x][i] == 1)
+			if (_arr[x][i] == 1)
 			{
 				verticalPoints++;
 			}
@@ -115,11 +128,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 		}
 		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i < _size && j < _size; i++, j++)
 		{
-			if (_board[i][j] == 0 || _board[i][j] == 2)
+			if (_arr[i][j] == 0 || _arr[i][j] == 2)
 			{
 				diagnalPoints = 0;
 			}
-			if (_board[i][j] == 1)
+			if (_arr[i][j] == 1)
 			{
 				diagnalPoints++;
 			}
@@ -138,11 +151,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 		}
 		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i > 0 && j < _size; i--, j++)
 		{
-			if (_board[i][j] == 0 || _board[i][j] == 2)
+			if (_arr[i][j] == 0 || _arr[i][j] == 2)
 			{
 				diagnalReversePoints = 0;
 			}
-			if (_board[i][j] == 1)
+			if (_arr[i][j] == 1)
 			{
 				diagnalReversePoints++;
 			}
@@ -156,11 +169,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 	case O:
 		for (int i = 0; i < _size; i++)
 		{
-			if (_board[i][y] == 0 || _board[i][y] == 1)
+			if (_arr[i][y] == 0 || _arr[i][y] == 1)
 			{
 				horizontalPoints = 0;
 			}
-			if (_board[i][y] == 2)
+			if (_arr[i][y] == 2)
 			{
 				horizontalPoints++;
 			}
@@ -172,11 +185,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 		}
 		for (int i = 0; i < _size; i++)
 		{
-			if (_board[x][i] == 0 || _board[x][i] == 1)
+			if (_arr[x][i] == 0 || _arr[x][i] == 1)
 			{
 				verticalPoints = 0;
 			}
-			if (_board[x][i] == 2)
+			if (_arr[x][i] == 2)
 			{
 				verticalPoints++;
 			}
@@ -188,11 +201,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 		}
 		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i < _size && j < _size; i++, j++)
 		{
-			if (_board[i][j] == 0 || _board[i][j] == 1)
+			if (_arr[i][j] == 0 || _arr[i][j] == 1)
 			{
 				diagnalPoints = 0;
 			}
-			if (_board[i][j] == 2)
+			if (_arr[i][j] == 2)
 			{
 				diagnalPoints++;
 			}
@@ -211,11 +224,11 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 		}
 		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i > 0 && j < _size; i--, j++)
 		{
-			if (_board[i][j] == 0 || _board[i][j] == 1)
+			if (_arr[i][j] == 0 || _arr[i][j] == 1)
 			{
 				diagnalPoints = 0;
 			}
-			if (_board[i][j] == 2)
+			if (_arr[i][j] == 2)
 			{
 				diagnalPoints++;
 			}
@@ -233,7 +246,7 @@ int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> Player
 	{
 		for (int j = 0; j < _size; j++)
 		{
-			if (_board[i][j] == 0)
+			if (_arr[i][j] == 0)
 			{
 				allPlacesOccupied = false;
 			}
