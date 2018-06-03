@@ -116,13 +116,13 @@ void Game::Draw(sf::RenderWindow &window)
 
 void Game::switchPlayer()
 {
-	if (currentPlayer == Player::X)
+	if (currentPlayer == Player::O)
 	{
-		currentPlayer = Player::O;
+		currentPlayer = Player::X;
 	}
 	else
 	{
-		currentPlayer = Player::X;
+		currentPlayer = Player::O;
 	}
 }
 
@@ -396,7 +396,6 @@ void Game::PlaceO(int x, int y)
 		break;
 
 	case X: // Human player -> it should never happen
-		switchPlayer();
 		break;
 	}
 }
