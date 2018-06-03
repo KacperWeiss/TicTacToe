@@ -130,7 +130,7 @@ void Game::DetectMouseClick(int x, int y)
 				if (CheckWin(boardCoordinatesX, boardCoordinatesY) == 1)
 				{
 					text.setFillColor(sf::Color::Green);
-					text.setString("Player X won! \n Press escape to go back!");
+					text.setString("Player X won! \n Press \'R\' to restart, \n or escape to go back!");
 					return;
 				}
 				
@@ -223,13 +223,13 @@ int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 		{
 			if (_board[i][j] == 0 || _board[i][j] == 2)
 			{
-				diagnalPoints = 0;
+				diagnalReversePoints = 0;
 			}
 			if (_board[i][j] == 1)
 			{
-				diagnalPoints++;
+				diagnalReversePoints++;
 			}
-			if (diagnalPoints >= _winningRowLength)
+			if (diagnalReversePoints >= _winningRowLength)
 			{
 				whoWon = 1;
 				return 1;
