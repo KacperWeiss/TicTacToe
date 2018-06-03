@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClInclude Include="CrossShape.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameLogic.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="stdafx.h" />
@@ -160,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="CrossShape.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameLogic.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -20,12 +20,21 @@ public:
 	void Draw(sf::RenderWindow &window);
 	void DetectMouseClick(int x, int y);	
 
-	int CheckWin()
+	int CheckWin() const
 	{
 		return whoWon;
 	}
+	int **GetBoard() const
+	{
+		return _board;
+	}
 
-	int CheckWin(int x, int y); // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
+	int CheckWin(int x, int y); // -1 -> Draw, 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
+
+	Player GetCurrentPlayer() const
+	{
+		return currentPlayer;
+	}
 
 private:
 	sf::RectangleShape boardOutline;

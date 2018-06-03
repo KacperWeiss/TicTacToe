@@ -1,151 +1,68 @@
 #include "stdafx.h"
-#include "Game.h"
+#include "GameLogic.h"
 
 
-Game::Game(float width, float height, int size, int winingRow)
+GameLogic::~GameLogic()
 {
-	if (!font.loadFromFile("ComicSansMS3.ttf"))
-	{
-		// error handling (will be done in future)
-	}
-	text.setFont(font);
-	text.setFillColor(sf::Color::White);
-	text.setOutlineThickness(1.0);
-	text.setOutlineColor(sf::Color::White);
-	text.setString("Current player: X ");
-	text.setPosition(sf::Vector2f(height + 60.0, 40.0));
-
-	_size = size;
-	_winningRowLength = winingRow;
-	currentPlayer = Player::X;
-	whoWon = 0;
-
-	_board = new int* [size];
-	for (int i = 0; i < size; i++)
-	{
-		_board[i] = new int[size];
-	}
-}
-
-Game::~Game()
-{
-	for (int i = 0; i < _size; i++) {
-		delete[] _board[i];
-	}
-	delete[] _board;
-}
-
-void Game::Reconfigure(float width, float height, int size, int winingRow)
-{
-	text.setFillColor(sf::Color::White);
-	text.setString("Current player: X ");
-	text.setPosition(sf::Vector2f(height + 60.0, 40.0));
-
-	currentPlayer = Player::X;
-	whoWon = 0;
-
-	// Deleting crosses
-	crossShapes.clear();
-
 	// Deleting old board array
 	for (int i = 0; i < _size; i++) {
-		delete[] _board[i];
+		delete[] _arr[i];
 	}
-	delete[] _board;
+	delete[] _arr;
+}
+
+void GameLogic::init(int size, int winningRow, int **board, Player player)
+{
+	// Deleting old board array
+	for (int i = 0; i < _size; i++) 
+	{
+		delete[] _arr[i];
+	}
+	delete[] _arr;
 
 	_size = size;
-	_winningRowLength = winingRow;
-
-	oneSquareHeight = ((height - 40) / size);
+	_winningRowLength = winningRow;
+	currentPlayer = player;
 
 	// Recreation of board array
-	_board = new int*[size];
+	_arr = new int*[size];
 	for (int i = 0; i < size; i++)
 	{
-		_board[i] = new int[size];
+		_arr[i] = new int[size];
 		for (int j = 0; j < size; j++)
 		{
-			_board[i][j] = 0;
+			_arr[i][j] = board[i][j];
 		}
 	}
-
-	boardInsideLines = new sf::RectangleShape[2 * (size - 1)];
-
-	for (int i = 0; i < size - 1; i++)
-	{
-		boardInsideLines[i].setSize(sf::Vector2f{ height - 32, 2 });
-		boardInsideLines[i].setPosition(sf::Vector2f{ 20 + oneSquareHeight * (i + 1), 20 });
-		boardInsideLines[i].setFillColor(sf::Color::White);
-		boardInsideLines[i].setRotation(90);
-	}
-	for (int i = 0; i < size - 1; i++)
-	{
-		boardInsideLines[i + size - 1].setSize(sf::Vector2f{ height - 32, 2 });
-		boardInsideLines[i + size - 1].setPosition(sf::Vector2f{ 20, 20 + oneSquareHeight * (i + 1) });
-		boardInsideLines[i + size - 1].setFillColor(sf::Color::White);
-	}
-
-	boardOutline.setSize(sf::Vector2f{ height - 32, height - 32 });
-	boardOutline.setPosition(sf::Vector2f{ 20, 20 });
-	boardOutline.setFillColor(sf::Color::Transparent);
-	boardOutline.setOutlineColor(sf::Color::White);
-	boardOutline.setOutlineThickness(4.0);
 }
 
-void Game::Draw(sf::RenderWindow &window)
+void GameLogic::setMarkX(int x, int y) 
 {
-	window.draw(boardOutline);
-	window.draw(text);
-
-	for (int i = 0; i < (2 * (_size - 1)); i++)
+	if (x < _size && x >= 0 && y < _size && y >= 0) 
 	{
-		window.draw(boardInsideLines[i]);
-	}
-
-	for (int i = 0; i < crossShapes.size(); i++)
-	{
-		window.draw(crossShapes[i]);
+		_arr[x][y] = 1;
 	}
 }
 
-void Game::DetectMouseClick(int x, int y)
+void GameLogic::setMarkO(int x, int y) 
 {
-	switch (currentPlayer)
+	if (x < _size && x >= 0 && y < _size && y >= 0) 
 	{
-	case X: // Human player
-		boardCoordinatesX = ((x - 20) / oneSquareHeight);
-		boardCoordinatesY = ((y - 20) / oneSquareHeight);
-
-		if (boardCoordinatesX >= 0 && boardCoordinatesX < _size && boardCoordinatesY >= 0 && boardCoordinatesY < _size)
-		{
-			if (_board[boardCoordinatesX][boardCoordinatesY] == 0)
-			{
-				if (whoWon != 0)
-				{
-					return;
-				}
-				_board[boardCoordinatesX][boardCoordinatesY] = 1;
-				CrossShape cross(20 + boardCoordinatesX * oneSquareHeight, 20 + boardCoordinatesY * oneSquareHeight, oneSquareHeight);
-				crossShapes.push_back(cross);
-				if (CheckWin(boardCoordinatesX, boardCoordinatesY) == 1)
-				{
-					text.setFillColor(sf::Color::Green);
-					text.setString("Player X won! \n Press \'R\' to restart, \n or escape to go back!");
-					return;
-				}
-				
-				//text.setString("Current player: O ");
-				//currentPlayer = Player::O;
-			}
-		}
-		break;
-
-	case O: // AI player - just do nothing
-		break;
+		_arr[x][y] = 2;
 	}
 }
 
-int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
+void GameLogic::clearMark(int x, int y) 
+{
+	_arr[x][y] = 0;
+}
+
+int GameLogic::checkSquare(int x, int y) 
+{
+	return _arr[x][y];
+}
+
+int GameLogic::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 {
 	int horizontalPoints = 0;
 	int verticalPoints = 0;
