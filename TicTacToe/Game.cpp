@@ -4,8 +4,21 @@
 
 Game::Game(float width, float height, int size, int winingRow)
 {
+	if (!font.loadFromFile("ComicSansMS3.ttf"))
+	{
+		// error handling (will be done in future)
+	}
+	text.setFont(font);
+	text.setFillColor(sf::Color::White);
+	text.setOutlineThickness(1.0);
+	text.setOutlineColor(sf::Color::White);
+	text.setString("Current player: X ");
+	text.setPosition(sf::Vector2f(height + 60.0, 40.0));
+
 	_size = size;
 	_winningRowLength = winingRow;
+	currentPlayer = Player::X;
+	whoWon = 0;
 
 	_board = new int* [size];
 	for (int i = 0; i < size; i++)
@@ -24,6 +37,16 @@ Game::~Game()
 
 void Game::Reconfigure(float width, float height, int size, int winingRow)
 {
+	text.setFillColor(sf::Color::White);
+	text.setString("Current player: X ");
+	text.setPosition(sf::Vector2f(height + 60.0, 40.0));
+
+	currentPlayer = Player::X;
+	whoWon = 0;
+
+	// Deleting crosses
+	crossShapes.clear();
+
 	// Deleting old board array
 	for (int i = 0; i < _size; i++) {
 		delete[] _board[i];
@@ -33,11 +56,17 @@ void Game::Reconfigure(float width, float height, int size, int winingRow)
 	_size = size;
 	_winningRowLength = winingRow;
 
+	oneSquareHeight = ((height - 40) / size);
+
 	// Recreation of board array
 	_board = new int*[size];
 	for (int i = 0; i < size; i++)
 	{
 		_board[i] = new int[size];
+		for (int j = 0; j < size; j++)
+		{
+			_board[i][j] = 0;
+		}
 	}
 
 	boardInsideLines = new sf::RectangleShape[2 * (size - 1)];
@@ -45,45 +74,242 @@ void Game::Reconfigure(float width, float height, int size, int winingRow)
 	for (int i = 0; i < size - 1; i++)
 	{
 		boardInsideLines[i].setSize(sf::Vector2f{ height - 32, 2 });
-		boardInsideLines[i].setPosition(sf::Vector2f{ 16 + (height / size) * (i + 1), 20 });
+		boardInsideLines[i].setPosition(sf::Vector2f{ 20 + oneSquareHeight * (i + 1), 20 });
 		boardInsideLines[i].setFillColor(sf::Color::White);
 		boardInsideLines[i].setRotation(90);
 	}
 	for (int i = 0; i < size - 1; i++)
 	{
 		boardInsideLines[i + size - 1].setSize(sf::Vector2f{ height - 32, 2 });
-		boardInsideLines[i + size - 1].setPosition(sf::Vector2f{ 20, 16 + (height / size) * (i + 1) });
+		boardInsideLines[i + size - 1].setPosition(sf::Vector2f{ 20, 20 + oneSquareHeight * (i + 1) });
 		boardInsideLines[i + size - 1].setFillColor(sf::Color::White);
 	}
 
-	// Linie wewenêtrzne i zewnêtrzne mo¿na zmieniæ w celu poprawienia ich wygl¹du
-	boardOutline[0].setSize(sf::Vector2f{ height - 32, 4 });
-	boardOutline[0].setPosition(sf::Vector2f{ 16, 16 });
-	boardOutline[0].setFillColor(sf::Color::White);
-
-	boardOutline[1].setSize(sf::Vector2f{ height - 32, 4 });
-	boardOutline[1].setPosition(sf::Vector2f{ 20, 16 });
-	boardOutline[1].setRotation(90);
-	boardOutline[1].setFillColor(sf::Color::White);
-
-	boardOutline[2].setSize(sf::Vector2f{ height - 32, 4 });
-	boardOutline[2].setPosition(sf::Vector2f{ height - 12, 16 });
-	boardOutline[2].setRotation(90);
-	boardOutline[2].setFillColor(sf::Color::White);
-
-	boardOutline[3].setSize(sf::Vector2f{ height - 28, 4 });
-	boardOutline[3].setPosition(sf::Vector2f{ 16, height - 16 });
-	boardOutline[3].setFillColor(sf::Color::White);
+	boardOutline.setSize(sf::Vector2f{ height - 32, height - 32 });
+	boardOutline.setPosition(sf::Vector2f{ 20, 20 });
+	boardOutline.setFillColor(sf::Color::Transparent);
+	boardOutline.setOutlineColor(sf::Color::White);
+	boardOutline.setOutlineThickness(4.0);
 }
 
 void Game::Draw(sf::RenderWindow &window)
 {
-	for (int i = 0; i < MAX_NUMBER_OF_SIDES; i++)
-	{
-		window.draw(boardOutline[i]);
-	}
+	window.draw(boardOutline);
+	window.draw(text);
+
 	for (int i = 0; i < (2 * (_size - 1)); i++)
 	{
 		window.draw(boardInsideLines[i]);
 	}
+
+	for (int i = 0; i < crossShapes.size(); i++)
+	{
+		window.draw(crossShapes[i]);
+	}
+}
+
+void Game::DetectMouseClick(int x, int y)
+{
+	switch (currentPlayer)
+	{
+	case X: // Human player
+		boardCoordinatesX = ((x - 20) / oneSquareHeight);
+		boardCoordinatesY = ((y - 20) / oneSquareHeight);
+
+		if (boardCoordinatesX >= 0 && boardCoordinatesX < _size && boardCoordinatesY >= 0 && boardCoordinatesY < _size)
+		{
+			if (_board[boardCoordinatesX][boardCoordinatesY] == 0)
+			{
+				if (whoWon != 0)
+				{
+					return;
+				}
+				_board[boardCoordinatesX][boardCoordinatesY] = 1;
+				CrossShape cross(20 + boardCoordinatesX * oneSquareHeight, 20 + boardCoordinatesY * oneSquareHeight, oneSquareHeight);
+				crossShapes.push_back(cross);
+				if (CheckWin(boardCoordinatesX, boardCoordinatesY) == 1)
+				{
+					text.setFillColor(sf::Color::Green);
+					text.setString("Player X won! \n Press escape to go back!");
+					return;
+				}
+				
+				//text.setString("Current player: O ");
+				//currentPlayer = Player::O;
+			}
+		}
+		break;
+
+	case O: // AI player - just do nothing
+		break;
+	}
+}
+
+int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
+{
+	int horizontalPoints = 0;
+	int verticalPoints = 0;
+
+	int diagnalPoints = 0;
+	int diagnalReversePoints = 0;
+
+	int diagnalAxisStartX = x;
+	int diagnalAxisStartY = y;
+	while (diagnalAxisStartX > 0 && diagnalAxisStartY > 0)
+	{
+		diagnalAxisStartX--;
+		diagnalAxisStartY--;
+	}
+
+	switch (currentPlayer)
+	{
+	case X:
+		for (int i = 0; i < _size; i++)
+		{
+			if (_board[i][y] == 0 || _board[i][y] == 2)
+			{
+				horizontalPoints = 0;
+			}
+			if (_board[i][y] == 1)
+			{
+				horizontalPoints++;
+			}
+			if (horizontalPoints == _winningRowLength)
+			{
+				whoWon = 1;
+				return 1;
+			}
+		}
+		for (int i = 0; i < _size; i++)
+		{
+			if (_board[x][i] == 0 || _board[x][i] == 2)
+			{
+				verticalPoints = 0;
+			}
+			if (_board[x][i] == 1)
+			{
+				verticalPoints++;
+			}
+			if (verticalPoints >= _winningRowLength)
+			{
+				whoWon = 1;
+				return 1;
+			}
+		}
+		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i < _size && j < _size; i++, j++)
+		{
+			if (_board[i][j] == 0 || _board[i][j] == 2)
+			{
+				diagnalPoints = 0;
+			}
+			if (_board[i][j] == 1)
+			{
+				diagnalPoints++;
+			}
+			if (diagnalPoints >= _winningRowLength)
+			{
+				whoWon = 1;
+				return 1;
+			}
+		}
+		diagnalAxisStartX = x;
+		diagnalAxisStartY = y;
+		while (diagnalAxisStartX < _size - 1 && diagnalAxisStartY > 0)
+		{
+			diagnalAxisStartX++;
+			diagnalAxisStartY--;
+		}
+		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i > 0 && j < _size; i--, j++)
+		{
+			if (_board[i][j] == 0 || _board[i][j] == 2)
+			{
+				diagnalPoints = 0;
+			}
+			if (_board[i][j] == 1)
+			{
+				diagnalPoints++;
+			}
+			if (diagnalPoints >= _winningRowLength)
+			{
+				whoWon = 1;
+				return 1;
+			}
+		}
+		break;
+	case O:
+		for (int i = 0; i < _size; i++)
+		{
+			if (_board[i][y] == 0 || _board[i][y] == 1)
+			{
+				horizontalPoints = 0;
+			}
+			if (_board[i][y] == 2)
+			{
+				horizontalPoints++;
+			}
+			if (horizontalPoints == _winningRowLength)
+			{
+				whoWon = 2;
+				return 2;
+			}
+		}
+		for (int i = 0; i < _size; i++)
+		{
+			if (_board[x][i] == 0 || _board[x][i] == 1)
+			{
+				verticalPoints = 0;
+			}
+			if (_board[x][i] == 2)
+			{
+				verticalPoints++;
+			}
+			if (verticalPoints >= _winningRowLength)
+			{
+				whoWon = 2;
+				return 2;
+			}
+		}
+		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i < _size && j < _size; i++, j++)
+		{
+			if (_board[i][j] == 0 || _board[i][j] == 1)
+			{
+				diagnalPoints = 0;
+			}
+			if (_board[i][j] == 2)
+			{
+				diagnalPoints++;
+			}
+			if (diagnalPoints >= _winningRowLength)
+			{
+				whoWon = 2;
+				return 2;
+			}
+		}
+		diagnalAxisStartX = x;
+		diagnalAxisStartY = y;
+		while (diagnalAxisStartX < _size - 1 && diagnalAxisStartY > 0)
+		{
+			diagnalAxisStartX++;
+			diagnalAxisStartY--;
+		}
+		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i > 0 && j < _size; i--, j++)
+		{
+			if (_board[i][j] == 0 || _board[i][j] == 1)
+			{
+				diagnalPoints = 0;
+			}
+			if (_board[i][j] == 2)
+			{
+				diagnalPoints++;
+			}
+			if (diagnalPoints >= _winningRowLength)
+			{
+				whoWon = 2;
+				return 2;
+			}
+		}
+		break;
+	}
+
+	return 0;
 }
