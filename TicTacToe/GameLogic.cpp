@@ -2,11 +2,6 @@
 #include "GameLogic.h"
 #include <iostream>
 
-GameLogic::GameLogic()
-{
-	whoWon = 0;
-}
-
 GameLogic::~GameLogic()
 {
 	// Deleting old board array

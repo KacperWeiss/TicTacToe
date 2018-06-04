@@ -9,6 +9,7 @@ Options::Options(float width, float height)
 		// error handling (will be done in future)
 	}
 
+	difficulty = Difficulties::Impossible;
 	selectedItemIndex = 0;
 	boardSizeValue = 3;
 	winningRowsValue = 3;
@@ -46,8 +47,22 @@ Options::Options(float width, float height)
 	menuItem[2].setFillColor(sf::Color::White);
 	menuItem[2].setOutlineThickness(1.0);
 	menuItem[2].setOutlineColor(sf::Color::White);
-	menuItem[2].setString("Back");
+	menuItem[2].setString("Set difficulty: ");
 	menuItem[2].setPosition(sf::Vector2f(width / 3, height / (MAX_NUMBER_OF_MENU_ITEMS + 1) * 3));
+
+	valueItem[2].setFont(font);
+	valueItem[2].setFillColor(sf::Color::White);
+	valueItem[2].setOutlineThickness(1.0);
+	valueItem[2].setOutlineColor(sf::Color::White);
+	valueItem[2].setString(GetDifficultyString());
+	valueItem[2].setPosition(sf::Vector2f((2 * width) / 3, height / (MAX_NUMBER_OF_MENU_ITEMS + 1) * 3));
+
+	menuItem[3].setFont(font);
+	menuItem[3].setFillColor(sf::Color::White);
+	menuItem[3].setOutlineThickness(1.0);
+	menuItem[3].setOutlineColor(sf::Color::White);
+	menuItem[3].setString("Back");
+	menuItem[3].setPosition(sf::Vector2f(width / 3, height / (MAX_NUMBER_OF_MENU_ITEMS + 1) * 4));
 
 }
 
@@ -65,7 +80,7 @@ void Options::Draw(sf::RenderWindow &window)
 
 void Options::ChangeState()
 {
-	if (currentState == OptionsState::Navigation && selectedItemIndex != 2)
+	if (currentState == OptionsState::Navigation && selectedItemIndex != 3)
 	{
 		currentState = OptionsState::ChangingValues;
 
@@ -118,6 +133,23 @@ void Options::MoveUp()
 				valueItem[1].setString(std::to_string(winningRowsValue));
 			}
 			break;
+		case 2: // Changing difficulties
+			switch (difficulty)
+			{
+			case Easy:
+				break;
+			case Medium:
+				difficulty = Difficulties::Easy;
+				break;
+			case Hard:
+				difficulty = Difficulties::Medium;
+				break;
+			case Impossible:
+				difficulty = Difficulties::Hard;
+				break;
+			}
+			valueItem[2].setString(GetDifficultyString());
+			break;
 		default:
 			break;
 		}
@@ -159,6 +191,23 @@ void Options::MoveDown()
 				valueItem[1].setString(std::to_string(winningRowsValue));
 			}
 			break;
+		case 2: // Changing difficulties
+			switch (difficulty)
+			{
+			case Easy:
+				difficulty = Difficulties::Medium;
+				break;
+			case Medium:
+				difficulty = Difficulties::Hard;
+				break;
+			case Hard:
+				difficulty = Difficulties::Impossible;
+				break;
+			case Impossible:
+				break;
+			}
+			valueItem[2].setString(GetDifficultyString());
+			break;
 		default:
 			break;
 		}
@@ -166,5 +215,41 @@ void Options::MoveDown()
 		break;
 	default:
 		break;
+	}
+}
+
+int Options::GetDifficulty()
+{
+	switch (difficulty)
+	{
+	case Easy:
+		return 2;
+
+	case Medium:
+		return 3;
+
+	case Hard:
+		return 5;
+
+	case Impossible:
+		return boardSizeValue * boardSizeValue;
+	}
+}
+
+std::string Options::GetDifficultyString()
+{
+	switch (difficulty)
+	{
+	case Easy:
+		return "Easy";
+
+	case Medium:
+		return "Medium";
+
+	case Hard:
+		return "Hard";
+
+	case Impossible:
+		return "Impossible";
 	}
 }

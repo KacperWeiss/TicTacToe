@@ -12,11 +12,10 @@ int const TIE = -1;
 int const MAX_PLAYER = 2;
 int const MIN_PLAYER = 1;
 
-Move PlayerAI::placeMark(Game *game, GameLogic *gameLogic, int x, int y) {
+Move PlayerAI::placeMark(Game *game, GameLogic *gameLogic, int difficulty) {
 
 	Move bestMove;
-	int depth = gameLogic->checkSize()*gameLogic->checkSize();
-	bestMove = alphaBeta(gameLogic, depth, -1000000, 1000000, MAX_PLAYER, x, y);
+	bestMove = alphaBeta(gameLogic, difficulty, -1000000, 1000000, MAX_PLAYER);
 	gameLogic->setMarkO(bestMove.x, bestMove.y);
 	gameLogic->Display();
 	game->PlaceO(bestMove.x, bestMove.y);
@@ -24,7 +23,7 @@ Move PlayerAI::placeMark(Game *game, GameLogic *gameLogic, int x, int y) {
 	return bestMove;
 }
 
-Move PlayerAI::miniMax(GameLogic *gameLogic, int depth, int player, int x, int y) {
+Move PlayerAI::miniMax(GameLogic *gameLogic, int depth, int player) {
 
 	int result = gameLogic->CheckWin();
 
@@ -53,12 +52,12 @@ Move PlayerAI::miniMax(GameLogic *gameLogic, int depth, int player, int x, int y
 				// tura AI
 				if (player == AI_PLAYER) {
 					gameLogic->setMarkO(x, y);
-					move.score = miniMax(gameLogic, depth - 1, HUMAN_PLAYER, move.x, move.y).score;
+					move.score = miniMax(gameLogic, depth - 1, HUMAN_PLAYER).score;
 				}
 				// tura gracza
 				else if (player == HUMAN_PLAYER) {
 					gameLogic->setMarkX(x, y);
-					move.score = miniMax(gameLogic, depth - 1, AI_PLAYER, move.x, move.y).score;
+					move.score = miniMax(gameLogic, depth - 1, AI_PLAYER).score;
 				}
 
 				moves.push_back(move);
@@ -91,7 +90,7 @@ Move PlayerAI::miniMax(GameLogic *gameLogic, int depth, int player, int x, int y
 	return moves[bestMove];
 }
 
-Move PlayerAI::alphaBeta(GameLogic *gameLogic, int depth, int alpha, int beta, int player, int x, int y) 
+Move PlayerAI::alphaBeta(GameLogic *gameLogic, int depth, int alpha, int beta, int player) 
 {
 	int v;
 	int result = gameLogic->CheckWin();
@@ -125,14 +124,14 @@ Move PlayerAI::alphaBeta(GameLogic *gameLogic, int depth, int alpha, int beta, i
 				// tura AI
 				if (player == MAX_PLAYER) {
 					gameLogic->setMarkO(x, y);
-					move.score = alphaBeta(gameLogic, depth - 1, alpha, beta, MIN_PLAYER, move.x, move.y).score;
+					move.score = alphaBeta(gameLogic, depth - 1, alpha, beta, MIN_PLAYER).score;
 					v = std::max(v, move.score);
 					alpha = std::max(alpha, v);
 				}
 				// tura gracza
 				else if (player == MIN_PLAYER) {
 					gameLogic->setMarkX(x, y);
-					move.score = alphaBeta(gameLogic, depth - 1, alpha, beta, MAX_PLAYER, move.x, move.y).score;
+					move.score = alphaBeta(gameLogic, depth - 1, alpha, beta, MAX_PLAYER).score;
 					v = std::min(v, move.score);
 					beta = std::min(beta, v);
 				}

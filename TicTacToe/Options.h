@@ -1,11 +1,16 @@
 #pragma once
 #include <SFML\/Graphics.hpp>
 
-#define MAX_NUMBER_OF_MENU_ITEMS 3
+#define MAX_NUMBER_OF_MENU_ITEMS 4
 
 enum OptionsState
 {
 	Navigation, ChangingValues
+};
+
+enum Difficulties
+{
+	Easy, Medium, Hard, Impossible
 };
 
 class Options
@@ -25,6 +30,8 @@ public:
 	int GetWinningRow() { return winningRowsValue; }
 	OptionsState GetCurrentOptionsState() { return currentState; }
 
+	int GetDifficulty();
+
 private:
 	OptionsState currentState;
 	int selectedItemIndex;
@@ -33,5 +40,9 @@ private:
 	sf::Font font;
 	sf::Text menuItem[MAX_NUMBER_OF_MENU_ITEMS];
 	sf::Text valueItem[MAX_NUMBER_OF_MENU_ITEMS - 1];
+
+	Difficulties difficulty;
+
+	std::string GetDifficultyString();
 };
 
