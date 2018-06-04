@@ -15,17 +15,21 @@ public:
 
 	int checkSquare(int x, int y);
 
+	/*
 	int CheckWin() const
 	{
 		return whoWon;
 	}
-
+	*/
+	int CheckWin();
 	int CheckWin(int x, int y); // -1 -> Draw, 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 
 	int checkSize()
 	{
 		return _size;
 	}
+
+	void Display();
 
 private:
 	int whoWon;

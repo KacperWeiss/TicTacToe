@@ -246,7 +246,7 @@ int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 			diagnalAxisStartX++;
 			diagnalAxisStartY--;
 		}
-		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i > 0 && j < _size; i--, j++)
+		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i >= 0 && j < _size; i--, j++)
 		{
 			if (_board[i][j] == 0 || _board[i][j] == 2)
 			{
@@ -319,17 +319,17 @@ int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 			diagnalAxisStartX++;
 			diagnalAxisStartY--;
 		}
-		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i > 0 && j < _size; i--, j++)
+		for (int i = diagnalAxisStartX, j = diagnalAxisStartY; i >= 0 && j < _size; i--, j++)
 		{
 			if (_board[i][j] == 0 || _board[i][j] == 1)
 			{
-				diagnalPoints = 0;
+				diagnalReversePoints = 0;
 			}
 			if (_board[i][j] == 2)
 			{
-				diagnalPoints++;
+				diagnalReversePoints++;
 			}
-			if (diagnalPoints >= _winningRowLength)
+			if (diagnalReversePoints >= _winningRowLength)
 			{
 				whoWon = 2;
 				return 2;
@@ -351,51 +351,57 @@ int Game::CheckWin(int x, int y) // 0 -> Not won, 1 -> PlayerX, 2 -> PlayerO
 	}
 	if (allPlacesOccupied)
 	{
+		whoWon = -1;
 		return -1;
 	}
 
+	whoWon = 0;
 	return 0;
 }
 
 void Game::PlaceO(int x, int y)
 {
-	switch (currentPlayer)
+	if (x >= 0 && x < _size && y >= 0 && y < _size)
 	{
-	case O: // AI player
-		if (_board[x][y] == 0)
+		switch (currentPlayer)
 		{
-			if (whoWon != 0)
+		case O: // AI player
+			if (_board[x][y] == 0)
 			{
-				return;
-			}
-			_board[x][y] = 2;
+				if (whoWon != 0)
+				{
+					return;
+				}
+				_board[x][y] = 2;
 
-			sf::CircleShape circle(20 + x * oneSquareHeight, 20 + y * oneSquareHeight);
-			circle.setRadius(oneSquareHeight / 2 - 4);
-			circle.setFillColor(sf::Color::Transparent);
-			circle.setOutlineColor(sf::Color::Blue);
-			circle.setOutlineThickness(2.0);
+				sf::CircleShape circle;
+				circle.setPosition(28 + (x * oneSquareHeight), 28 + (y * oneSquareHeight));
+				circle.setRadius((oneSquareHeight / 2) - 16);
+				circle.setFillColor(sf::Color::Transparent);
+				circle.setOutlineColor(sf::Color::Blue);
+				circle.setOutlineThickness(2.0);
 
-			cirkleShapes.push_back(circle);
-			if (CheckWin(boardCoordinatesX, boardCoordinatesY) == 2)
-			{
-				text.setFillColor(sf::Color::Red);
-				text.setString("Player O won! \n Press \'R\' to restart, \n or escape to go back!");
-				return;
-			}
-			else if (CheckWin(boardCoordinatesX, boardCoordinatesY) == -1)
-			{
-				text.setFillColor(sf::Color::Yellow);
-				text.setString("Draw! \n Press \'R\' to restart, \n or escape to go back!");
-				return;
-			}
+				cirkleShapes.push_back(circle);
+				if (CheckWin(x, y) == 2)
+				{
+					text.setFillColor(sf::Color::Red);
+					text.setString("Player O won! \n Press \'R\' to restart, \n or escape to go back!");
+					return;
+				}
+				else if (CheckWin(x, y) == -1)
+				{
+					text.setFillColor(sf::Color::Yellow);
+					text.setString("Draw! \n Press \'R\' to restart, \n or escape to go back!");
+					return;
+				}
 
-			text.setString("Current player: X ");
-			switchPlayer();
+				text.setString("Current player: X ");
+				switchPlayer();
+			}
+			break;
+
+		case X: // Human player -> it should never happen
+			break;
 		}
-		break;
-
-	case X: // Human player -> it should never happen
-		break;
 	}
 }

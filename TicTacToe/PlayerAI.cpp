@@ -18,6 +18,7 @@ Move PlayerAI::placeMark(Game *game, GameLogic *gameLogic, int x, int y) {
 	int depth = gameLogic->checkSize()*gameLogic->checkSize();
 	bestMove = alphaBeta(gameLogic, depth, -1000000, 1000000, MAX_PLAYER, x, y);
 	gameLogic->setMarkO(bestMove.x, bestMove.y);
+	gameLogic->Display();
 	game->PlaceO(bestMove.x, bestMove.y);
 
 	return bestMove;
@@ -93,7 +94,7 @@ Move PlayerAI::miniMax(GameLogic *gameLogic, int depth, int player, int x, int y
 Move PlayerAI::alphaBeta(GameLogic *gameLogic, int depth, int alpha, int beta, int player, int x, int y) 
 {
 	int v;
-	int result = gameLogic->CheckWin(x, y);
+	int result = gameLogic->CheckWin();
 
 	if (result == MAX_PLAYER) {
 		return Move(10);
