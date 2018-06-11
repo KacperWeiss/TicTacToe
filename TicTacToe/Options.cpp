@@ -223,13 +223,13 @@ int Options::GetDifficulty()
 	switch (difficulty)
 	{
 	case Easy:
-		return 2;
+		return 2 + boardSizeValue != 3 ? 1 : 0;
 
 	case Medium:
-		return 3;
+		return boardSizeValue;
 
 	case Hard:
-		return 5;
+		return boardSizeValue * boardSizeValue * 0.5;
 
 	case Impossible:
 		return boardSizeValue * boardSizeValue;
